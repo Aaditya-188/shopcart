@@ -15,7 +15,8 @@ function ProductPage() {
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-                const response = await fetch(`/api/products/${id}`);
+                const response = await fetch(`https://shopcart-2-52cj.onrender.com/api/products/${id}`);
+
                 const data = await response.json();
 
                 setProduct(data);

@@ -29,8 +29,8 @@ function ProductGrid({ category }) {
         const fetchProductData = async () => {
             try {
                 const endpoint = category
-                    ? `/api/products?category=${category}`
-                    : `/api/products`;
+                    ? `https://shopcart-2-52cj.onrender.com/api/products?category=${category}`
+                    : `https://shopcart-2-52cj.onrender.com/api/products`;
 
                 const response = await fetch(endpoint);
                 const data = await response.json();

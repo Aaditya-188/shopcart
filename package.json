@@ -4,10 +4,13 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "start": "concurrently \"npm run react\" \"npm run api\"",
-        "react": "vite",
-        "api": "cd src/api && npm start"
-    },
+  "start": "concurrently \"npm run react\" \"npm run api\"",
+  "react": "vite",
+  "api": "cd src/api && npm start",
+  "build": "vite build",
+  "preview": "vite preview",
+  "dev": "vite"
+   },
     "dependencies": {
         "init": "^0.1.2",
         "lodash": "^4.17.21",

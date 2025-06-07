@@ -11,7 +11,7 @@ function RelatedProducts({ category }) {
         const fetchProductData = async () => {
             try {
                 const response = await fetch(
-                    `/api/products/related/${category}`
+                    `https://shopcart-2-52cj.onrender.com/api/products/related/${category}`
                 );
                 const data = await response.json();
 
@@ -25,7 +25,7 @@ function RelatedProducts({ category }) {
         };
 
         fetchProductData();
-    }, []);
+    }, [category]);
 
     useEffect(() => {
         console.log(products);
@@ -45,12 +45,11 @@ function RelatedProducts({ category }) {
                             >
                                 <a
                                     href={product.uri}
-                                    className="flex
-                                 flex-col hover:underline"
+                                    className="flex flex-col hover:underline"
                                 >
                                     <LazyLoadImage
                                         effect="blur"
-                                        src={"../" + product.image}
+                                        src={product.image}
                                         alt={product.description}
                                         className="mb-4 w-full"
                                     />

@@ -1,16 +1,25 @@
 require("dotenv").config();
 const express = require("express");
-const app = express();
-const PORT = process.env.PORT;
+const cors = require("cors");
 
+const app = express();
+const PORT = process.env.PORT || 5000;
 const database = require("./database");
+
+// ✅ Enable CORS for multiple Netlify frontend URLs
+app.use(cors({
+    origin: [
+        "https://amazing-pegasus-c2b674.netlify.app",
+        "https://superlative-moonbeam-54f566.netlify.app"
+    ],
+    credentials: true
+}));
 
 app.use(express.json());
 
 // ✅ Get all products OR filter by category
 app.get("/api/products", (req, res) => {
     const category = req.query.category;
-
     let query = "SELECT * FROM products";
     let params = [];
 

@@ -24,12 +24,13 @@ function ProductGrid({ category }) {
         isDataLoaded: false,
     });
 
-    // ✅ Fetch Products by Category
+    // ✅ Fetch Products by Category (normalized)
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-                const endpoint = category
-                    ? `https://shopcart-2-52cj.onrender.com/api/products?category=${category}`
+                const normalizedCategory = category?.toLowerCase();
+                const endpoint = normalizedCategory
+                    ? `https://shopcart-2-52cj.onrender.com/api/products?category=${normalizedCategory}`
                     : `https://shopcart-2-52cj.onrender.com/api/products`;
 
                 const response = await fetch(endpoint);

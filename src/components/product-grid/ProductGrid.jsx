@@ -14,95 +14,86 @@ const ITEMS_PER_PAGE = 12;
 const INITIAL_PAGE_COUNT = 1;
 
 function ProductGrid({ category }) {
-    const [products, setProducts] = useState([]); // Holds the current state of the products (e.g when after filtered or sorted)
-
+    const [products, setProducts] = useState([]);
     const [sortedProducts, setSortedProducts] = useState({});
     const [filteredProducts, setFilteredProducts] = useState({});
     const [pageCount, setPageCount] = useState(INITIAL_PAGE_COUNT);
 
-    // Holds state of products from GET request
     const [productData, setProductData] = useState({
         products: [],
-        isDataLoaded: false, // Ensures the useEffect hooks renders when fetch is returned
+        isDataLoaded: false,
     });
 
+    // ✅ Fetch Products by Category
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-                const response = await fetch("/api/products");
+                const endpoint = category
+                    ? `/api/products?category=${category}`
+                    : `/api/products`;
+
+                const response = await fetch(endpoint);
                 const data = await response.json();
 
                 setProductData({
                     products: data,
                     isDataLoaded: true,
                 });
+
+                console.log("✅ Products fetched:", data.length);
             } catch (error) {
-                console.log("Problem with API connectivity", error);
+                console.error("❌ Error fetching products", error);
             }
         };
 
         fetchProductData();
-    }, []);
+    }, [category]);
 
+    // ✅ Apply Sorting + Filtering
     useEffect(() => {
         validate();
     }, [sortedProducts, filteredProducts, productData]);
 
-    // Only returns the products with the correct category
     const getCategoryProducts = () => {
-        if (category) {
-            return productData.products.filter(
-                (product) => product.category === category
-            );
-        }
-
-        // When no prop category is set (e.g on homepage)
         return productData.products;
     };
 
-    /** This function makes sure the correct products are being displayed 
-       when filtering/sorting is selected */
     const validate = () => {
-        // Sets sorted products when no filtering
         if (sortedProducts.isSorted && !filteredProducts.isFiltered) {
             return setProducts(sortedProducts.products);
         }
 
-        // Sets filtered products when no sorting
         if (filteredProducts.isFiltered && !sortedProducts.isSorted) {
             return setProducts(filteredProducts.products);
         }
 
-        // Sets both
         if (sortedProducts.isSorted && filteredProducts.isFiltered) {
             return setProducts(
                 sortedProducts.products.filter((product) =>
                     filteredProducts.products.some(
-                        (filteredProduct) => filteredProduct.id == product.id
+                        (fp) => fp.id === product.id
                     )
                 )
             );
         }
 
-        // Else return all category products
         return setProducts(getCategoryProducts());
     };
 
     const handleLoadMore = () => {
-        setPageCount((prevPageCount) => prevPageCount + 1);
+        setPageCount((prev) => prev + 1);
     };
 
     const getPaginatedData = () => {
-        const startIndex = (pageCount - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-
-        return products.slice(0, endIndex);
+        const start = (pageCount - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        return products.slice(0, end);
     };
 
     return (
         <>
             <div className="max-w-screen-2xl mx-auto p-9 flex flex-col md:flex-col lg:flex-row">
-                <div className="flex flex-col relative lg:mr-8  mb-5 lg:mb-0">
+                <div className="flex flex-col relative lg:mr-8 mb-5 lg:mb-0">
                     <ProductFiltering
                         products={getCategoryProducts()}
                         setFilteredProducts={setFilteredProducts}
@@ -124,85 +115,73 @@ function ProductGrid({ category }) {
                     </div>
 
                     <div className="min-h-[80%]">
-                        <ul className="mt-2 mb-12 product-list overflow-hidden">
-                            {/* Renders products */}
+                        <ul className="mt-2 mb-12 product-list overflow-hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {getPaginatedData().length > 0 ? (
-                                getPaginatedData().map((product) => {
-                                    return (
-                                        <li
-                                            key={product.id}
-                                            className="flex flex-col product-item justify-between"
+                                getPaginatedData().map((product) => (
+                                    <li
+                                        key={product.id}
+                                        className="flex flex-col product-item justify-between border p-3 rounded-lg shadow"
+                                    >
+                                        <a
+                                            href={`/products/${product.uri}`}
+                                            className="hover:underline flex flex-col items-center"
                                         >
-                                            <a
-                                                href={"products/" + product.uri}
-                                                className="hover:underline flex flex-col"
-                                            >
-                                                <LazyLoadImage
-                                                    effect="blur"
-                                                    src={product.image}
-                                                    alt={product.description}
-                                                    width={250}
-                                                    height={250}
-                                                />
-
-                                                <span className="text-base">
-                                                    {product.title}
-                                                </span>
-                                            </a>
-
-                                            <StarRatings
-                                                rating={product.rating}
+                                            <LazyLoadImage
+                                                effect="blur"
+                                                src={product.image}
+                                                alt={product.description}
+                                                width={250}
+                                                height={250}
+                                                className="object-contain"
                                             />
+                                            <span className="text-base mt-2">
+                                                {product.title}
+                                            </span>
+                                        </a>
 
-                                            <p className="h-fit text-sm my-1">
-                                                {product.description}
-                                            </p>
+                                        <StarRatings rating={product.rating} />
 
-                                            {product.discounted_price ? (
-                                                <div className="float-left">
-                                                    <span className="text-base line-through pr-2">
-                                                        ${product.price}
-                                                    </span>
-                                                    <span className="text-emerald-600 text-lg">
-                                                        $
-                                                        {
-                                                            product.discounted_price
-                                                        }
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-lg">
+                                        <p className="text-sm my-1 h-12 overflow-hidden text-ellipsis">
+                                            {product.description}
+                                        </p>
+
+                                        {product.discounted_price ? (
+                                            <div className="flex items-center space-x-2">
+                                                <span className="line-through text-gray-500">
                                                     ${product.price}
                                                 </span>
-                                            )}
+                                                <span className="text-emerald-600 font-semibold">
+                                                    ${product.discounted_price}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-lg font-semibold">
+                                                ${product.price}
+                                            </span>
+                                        )}
 
-                                            <AddToCartButton
-                                                product={product}
-                                            />
-                                        </li>
-                                    );
-                                })
+                                        <AddToCartButton product={product} />
+                                    </li>
+                                ))
                             ) : (
                                 <span className="text-center w-full block mt-5">
-                                    No products in that price range.
+                                    No products found.
                                 </span>
                             )}
                         </ul>
                     </div>
 
                     <div className="flex justify-center mx-auto">
-                        <div className="d-grid text-center">
-                            <div className="text-sm p-6">
-                                <ProductCounter
-                                    count={getPaginatedData().length}
-                                    total={getCategoryProducts().length}
-                                />
-                            </div>
+                        <div className="text-center">
+                            <ProductCounter
+                                count={getPaginatedData().length}
+                                total={getCategoryProducts().length}
+                            />
 
                             {products.length > pageCount * ITEMS_PER_PAGE && (
                                 <button
                                     onClick={handleLoadMore}
-                                    className="text-black border bg-white font-normal py-2 px-8 mb-8"
+                                    className="mt-3 text-black border border-gray-300 bg-white font-medium py-2 px-6 rounded hover:bg-gray-100"
                                 >
                                     Load More
                                 </button>
@@ -216,4 +195,5 @@ function ProductGrid({ category }) {
         </>
     );
 }
+
 export default ProductGrid;

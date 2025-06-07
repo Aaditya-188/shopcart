@@ -1,21 +1,34 @@
 require("dotenv").config();
-
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT;
 
 const database = require("./database");
 
+app.use(express.json());
+
+// ✅ Get all products OR filter by category
 app.get("/api/products", (req, res) => {
-    database.query("SELECT * FROM products", (error, results) => {
+    const category = req.query.category;
+
+    let query = "SELECT * FROM products";
+    let params = [];
+
+    if (category) {
+        query += " WHERE category = ?";
+        params.push(category);
+    }
+
+    database.query(query, params, (error, results) => {
         if (error) {
+            console.error(error);
             return res.status(500).json({ error: "An error occurred" });
         }
-
         res.json(results);
     });
 });
 
+// ✅ Get single product by URI
 app.get("/api/products/:id", (req, res) => {
     const productId = req.params.id;
 
@@ -26,29 +39,27 @@ app.get("/api/products/:id", (req, res) => {
             if (error) {
                 return res.status(500).json({ error: "An error occurred" });
             }
-
-            res.json(results);
+            res.json(results[0]);
         }
     );
 });
 
-// Returns 3 products from that category
+// ✅ Get related products by category
 app.get("/api/products/related/:id", (req, res) => {
     const category = req.params.id;
 
     database.query(
-        "SELECT * FROM products WHERE category = ? LIMIT 4;",
+        "SELECT * FROM products WHERE category = ? LIMIT 4",
         [category],
         (error, results) => {
             if (error) {
                 return res.status(500).json({ error: "An error occurred" });
             }
-
             res.json(results);
         }
     );
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
 });

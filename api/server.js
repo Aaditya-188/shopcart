@@ -9,11 +9,13 @@ const database = require("./database");
 // ✅ Enable CORS for multiple Netlify frontend URLs
 app.use(cors({
     origin: [
+        "http://localhost:5173", // ← allow local dev
         "https://amazing-pegasus-c2b674.netlify.app",
         "https://superlative-moonbeam-54f566.netlify.app"
     ],
     credentials: true
 }));
+
 
 app.use(express.json());
 

@@ -19,7 +19,7 @@ function Cart() {
     useEffect(() => {
         const fetchProductData = async () => {
             try {
-               const response = await fetch("https://shopcart-2-52cj.onrender.com/api/products");
+               const response = await fetch("https://shopcart-3-wh1u.onrender.com/api/products");
                 const data = await response.json();
 
                 setProductData({

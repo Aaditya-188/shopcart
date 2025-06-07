@@ -30,8 +30,8 @@ function ProductGrid({ category }) {
             try {
                 const normalizedCategory = category?.toLowerCase();
                 const endpoint = normalizedCategory
-                    ? `https://shopcart-2-52cj.onrender.com/api/products?category=${normalizedCategory}`
-                    : `https://shopcart-2-52cj.onrender.com/api/products`;
+                    ? `https://shopcart-3-wh1u.onrender.com/api/products?category=${normalizedCategory}`
+                    : `https://shopcart-3-wh1u.onrender.com/api/products`;
 
                 const response = await fetch(endpoint);
                 const data = await response.json();

@@ -11,10 +11,10 @@ function RelatedProducts({ category }) {
         const fetchProductData = async () => {
             try {
                 const response = await fetch(
-                    `https://shopcart-2-52cj.onrender.com/api/products/related/${category}`
+                    `https://shopcart-3-wh1u.onrender.com/api/products/related/${category}`
                 );
                 const data = await response.json();
-
+npm
                 setProduct({
                     products: data,
                     isDataLoaded: true,
